@@ -3,6 +3,8 @@ require_once 'database.php';
 require_once 'auth.php';
 requireAdmin(); // Only admins can access this page
 
+
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {

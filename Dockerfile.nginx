@@ -8,3 +8,8 @@ EXPOSE 85
 
 # Command untuk menjalankan nginx 
 CMD ["nginx", "-g", "daemon off;"]
+
+
+
+
+

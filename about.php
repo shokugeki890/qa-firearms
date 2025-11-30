@@ -6,6 +6,8 @@ require_once 'auth.php';
 <!DOCTYPE html>
 <html lang="en">
 
+
+
 <head>
     <meta charset="utf-8">
     <title>About Us - Rhys Firearms</title>

@@ -5,6 +5,8 @@ require_once 'auth.php';
 $message = '';
 $error = '';
 
+
+
 // Handle cart actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if (!isLoggedIn()) {

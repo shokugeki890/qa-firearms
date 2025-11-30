@@ -5,6 +5,8 @@ require_once 'auth.php';
 $message = '';
 $error = '';
 
+
+
 // Redirect if not logged in
 if (!isLoggedIn()) {
     header('Location: login.php');
