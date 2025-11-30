@@ -1,4 +1,5 @@
 version: '3.8'
+<<<<<<< HEAD
 
 services:
   # Nginx Web Server (Custom Build)
@@ -73,3 +74,10 @@ networks:
 
 
 
+=======
+services:
+ nginx:
+  build: .
+  ports:
+    - "80:80"
+>>>>>>> 0fcfeea15a1bc5220164b9645aab8abd91e0f5d6
