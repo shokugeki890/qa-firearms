@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS transaction (
 
 $pdo->exec($createTransactionTable);
 
+<<<<<<< HEAD
 // Create orders table if it doesn't exist
 $createOrdersTable = "
 CREATE TABLE IF NOT EXISTS orders (
@@ -159,6 +160,8 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 $pdo->exec($createTransactionsTable);
 
+=======
+>>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
 // Insert default products if not exists
 $checkProducts = $pdo->query("SELECT COUNT(*) FROM products");
 if ($checkProducts->fetchColumn() == 0) {

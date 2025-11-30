@@ -1,0 +1,21 @@
+# Dockerfile
+FROM nginx
+
+# Copy file konfigurasi default nginx dengan yang baru
+COPY ./default.conf /etc/nginx/conf.d/default.conf
+
+# Buat direktori dan copy file HTML
+RUN mkdir -p /var/www/belajarnginx
+
+# Salin file index.html ke belajarnginx
+COPY index.html /var/www/belajarnginx/
+
+# Ubah permission untuk folder
+RUN chown -R www-data:www-data /var/www/belajarnginx
+RUN chmod -R 775 /var/www/belajarnginx
+
+# Expose port 80
+EXPOSE 80
+
+# Command untuk menjalankan nginx
+CMD ["nginx", "-g", "daemon off;"]
