@@ -1,5 +1,5 @@
 <?php
-require_once 'database.php';
+require_once 'connection.php';
 require_once 'auth.php';
 
 $message = '';
@@ -104,10 +104,11 @@ if (isLoggedIn()) {
     $stmt->execute([$user_id]);
     $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($cart_items as $item) {
-        $total += $item['price'] * $item['quantity'];
-        $item_count += $item['quantity'];
-    }
+    require_once 'src/CartManager.php';
+    $cartManager = new CartManager();
+    
+    $total = $cartManager->hitungTotal($cart_items);
+    $item_count = $cartManager->hitungJumlahBarang($cart_items);
 }
 ?>
 

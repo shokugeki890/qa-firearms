@@ -1,0 +1,5 @@
+[mysqld]
+skip_ssl
+require_secure_transport = OFF
+bind-address = 0.0.0.0
+default_authentication_plugin = mysql_native_password
