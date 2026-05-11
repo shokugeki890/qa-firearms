@@ -1,5 +1,4 @@
 version: '3.8'
-<<<<<<< HEAD
 
 services:
   # Nginx Web Server (Custom Build)
@@ -8,7 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile.nginx
     ports:
-      - "85:85"
+      - "88:88"
     volumes:
       - .:/var/www/myphpapp
     depends_on:
@@ -29,7 +28,7 @@ services:
       - mysql
     environment:
       DB_HOST: mysql
-      DB_NAME: rhys_firearms
+      DB_NAME: myapp
       DB_USER: root
       DB_PASSWORD: password
     networks:
@@ -40,7 +39,7 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: rhys_firearms
+      MYSQL_DATABASE: myapp
       MYSQL_USER: appuser
       MYSQL_PASSWORD: password
     volumes:
@@ -54,7 +53,7 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
-      - "8085:80"
+      - "8088:80"
     environment:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: password
@@ -71,13 +70,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-
-
-
-=======
-services:
- nginx:
-  build: .
-  ports:
-    - "80:80"
->>>>>>> 0fcfeea15a1bc5220164b9645aab8abd91e0f5d6

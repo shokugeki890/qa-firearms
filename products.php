@@ -1,6 +1,118 @@
 <?php
-require_once 'database.php';
+require_once 'connection.php';
 require_once 'auth.php';
+
+$hasFilterQuery = !empty($_GET);
+
+$selectedCategories = [
+    'rifles' => $hasFilterQuery ? isset($_GET['filter_rifles']) : true,
+    'shotguns' => $hasFilterQuery ? isset($_GET['filter_shotguns']) : true,
+    'handguns' => $hasFilterQuery ? isset($_GET['filter_handguns']) : true,
+    'services' => $hasFilterQuery ? isset($_GET['filter_services']) : true,
+];
+
+$selectedCalibers = [
+    '9mm' => $hasFilterQuery ? isset($_GET['caliber_9mm']) : false,
+    '45acp' => $hasFilterQuery ? isset($_GET['caliber_45acp']) : false,
+    '223' => $hasFilterQuery ? isset($_GET['caliber_223']) : false,
+    '308' => $hasFilterQuery ? isset($_GET['caliber_308']) : false,
+    '12g' => $hasFilterQuery ? isset($_GET['caliber_12g']) : false,
+];
+
+$priceRange = $hasFilterQuery ? (int)($_GET['price_range'] ?? 5000) : 5000;
+$priceRange = max(0, min(5000, $priceRange));
+
+$sortBy = $_GET['sort'] ?? 'featured';
+
+if ($priceRange <= 500) {
+    $priceRangeText = '$0 - $' . $priceRange;
+} else {
+    $priceRangeText = '$' . max(0, $priceRange - 500) . ' - $' . $priceRange;
+}
+
+$whereClauses = ['1=1'];
+$queryParams = [];
+
+// Category filter
+$categoryClauses = [];
+$hasCategoryQuery = isset($_GET['filter_rifles']) || isset($_GET['filter_shotguns']) || isset($_GET['filter_handguns']) || isset($_GET['filter_services']);
+if ($hasCategoryQuery) {
+    if ($selectedCategories['rifles']) {
+        $categoryClauses[] = "p.name LIKE '%Rifle%' OR p.name LIKE '%Bolt Action%'";
+    }
+    if ($selectedCategories['shotguns']) {
+        $categoryClauses[] = "p.name LIKE '%Shotgun%'";
+    }
+    if ($selectedCategories['handguns']) {
+        $categoryClauses[] = "p.name LIKE '%Pistol%' OR p.name LIKE '%Handgun%'";
+    }
+    if ($selectedCategories['services']) {
+        $categoryClauses[] = "c.name = 'accessories' OR p.type = 'accessory' OR p.type = 'course' OR p.type = 'subscription' OR p.name LIKE '%Training%' OR p.name LIKE '%Certification%'";
+    }
+}
+
+if (!empty($categoryClauses)) {
+    $whereClauses[] = '(' . implode(' OR ', $categoryClauses) . ')';
+}
+
+// Caliber filter
+$caliberClauses = [];
+if ($hasFilterQuery) {
+    if ($selectedCalibers['9mm']) {
+        $caliberClauses[] = "p.name LIKE '%RP9 9mm%'";
+    }
+    if ($selectedCalibers['45acp']) {
+        $caliberClauses[] = "p.name LIKE '%RP45 .45 ACP%'";
+    }
+    if ($selectedCalibers['223']) {
+        $caliberClauses[] = "p.name LIKE '%R-15%'";
+        $caliberClauses[] = "p.name LIKE '%R-10%'";
+    }
+    if ($selectedCalibers['308']) {
+        $caliberClauses[] = "p.name LIKE '%R-700%'";
+    }
+    if ($selectedCalibers['12g']) {
+        $caliberClauses[] = "p.name LIKE '%Shotgun%'";
+    }
+
+    if (!empty($caliberClauses)) {
+        $whereClauses[] = '(' . implode(' OR ', $caliberClauses) . ')';
+    }
+}
+
+$whereClauses[] = 'p.price <= ?';
+$queryParams[] = $priceRange;
+
+$orderBy = 'p.created_at DESC';
+switch ($sortBy) {
+    case 'price_asc':
+        $orderBy = 'p.price ASC';
+        break;
+    case 'price_desc':
+        $orderBy = 'p.price DESC';
+        break;
+    case 'name_asc':
+        $orderBy = 'p.name ASC';
+        break;
+    case 'newest':
+        $orderBy = 'p.created_at DESC';
+        break;
+    default:
+        $orderBy = 'p.created_at DESC';
+        break;
+}
+
+$productQuery = "
+    SELECT p.*, c.name as category_name, t.name as team_name
+    FROM products p
+    LEFT JOIN category c ON p.category_id = c.id
+    LEFT JOIN teams t ON p.team_id = t.id
+    WHERE " . implode(' AND ', $whereClauses) . "
+    ORDER BY $orderBy
+";
+$stmt = $pdo->prepare($productQuery);
+$stmt->execute($queryParams);
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 
@@ -392,11 +504,8 @@ require_once 'auth.php';
                     </p>
                 </div>
                 <div class="col-md-4 text-md-end">
-                    <a href="cart.php" class="btn btn-accent position-relative">
+                    <a href="cart.php" class="btn btn-accent">
                         <i class="bi bi-cart3"></i> View Cart
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            3
-                        </span>
                     </a>
                 </div>
             </div>
@@ -425,6 +534,7 @@ require_once 'auth.php';
     <!-- Products Section Start -->
     <div class="container-fluid py-5 bg-secondary-custom">
         <div class="container">
+            <form method="GET" action="products.php" id="filterForm">
             <div class="row">
                 <!-- Filters Sidebar -->
                 <div class="col-lg-3 mb-5">
@@ -435,27 +545,27 @@ require_once 'auth.php';
                         <div class="mb-4">
                             <h6 class="text-white mb-3">Category</h6>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="filter-rifles" checked>
+                                <input class="form-check-input" type="checkbox" id="filter-rifles" name="filter_rifles" value="1" <?php echo $selectedCategories['rifles'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label text-bright" for="filter-rifles">
                                     Rifles
                                 </label>
                             </div>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="filter-shotguns" checked>
+                                <input class="form-check-input" type="checkbox" id="filter-shotguns" name="filter_shotguns" value="1" <?php echo $selectedCategories['shotguns'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label text-bright" for="filter-shotguns">
                                     Shotguns
                                 </label>
                             </div>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="filter-handguns" checked>
+                                <input class="form-check-input" type="checkbox" id="filter-handguns" name="filter_handguns" value="1" <?php echo $selectedCategories['handguns'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label text-bright" for="filter-handguns">
                                     Handguns
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="filter-accessories">
-                                <label class="form-check-label text-bright" for="filter-accessories">
-                                    Accessories
+                                <input class="form-check-input" type="checkbox" id="filter-services" name="filter_services" value="1" <?php echo $selectedCategories['services'] ? 'checked' : ''; ?> >
+                                <label class="form-check-label text-bright" for="filter-services">
+                                    Services
                                 </label>
                             </div>
                         </div>
@@ -465,49 +575,49 @@ require_once 'auth.php';
                             <h6 class="text-white mb-3">Price Range</h6>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="text-bright">$0</span>
-                                <span class="price-range">$500 - $2,500</span>
+                                <span class="price-range"><?php echo htmlspecialchars($priceRangeText); ?></span>
                                 <span class="text-bright">$5,000</span>
                             </div>
-                            <input type="range" class="form-range" min="0" max="5000" step="100" id="priceRange">
+                            <input type="range" class="form-range" min="0" max="5000" step="100" id="priceRange" name="price_range" value="<?php echo htmlspecialchars($priceRange); ?>">
                         </div>
                         
                         <!-- Caliber Filter -->
                         <div class="mb-4">
                             <h6 class="text-white mb-3">Caliber</h6>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="caliber-9mm">
+                                <input class="form-check-input" type="checkbox" id="caliber-9mm" name="caliber_9mm" value="1" <?php echo $selectedCalibers['9mm'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label text-bright" for="caliber-9mm">
-                                    9mm
+                                    9mm (Handguns)
                                 </label>
                             </div>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="caliber-45acp">
+                                <input class="form-check-input" type="checkbox" id="caliber-45acp" name="caliber_45acp" value="1" <?php echo $selectedCalibers['45acp'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label text-bright" for="caliber-45acp">
-                                    .45 ACP
+                                    .45 ACP (Handguns)
                                 </label>
                             </div>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="caliber-223">
+                                <input class="form-check-input" type="checkbox" id="caliber-223" name="caliber_223" value="1" <?php echo $selectedCalibers['223'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label text-bright" for="caliber-223">
-                                    .223 Remington
+                                    .223 Remington (Assault Rifles)
                                 </label>
                             </div>
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="caliber-308">
+                                <input class="form-check-input" type="checkbox" id="caliber-308" name="caliber_308" value="1" <?php echo $selectedCalibers['308'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label text-bright" for="caliber-308">
-                                    .308 Winchester
+                                    .308 Winchester (Hunting / Sniper Rifles)
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="caliber-12g">
+                                <input class="form-check-input" type="checkbox" id="caliber-12g" name="caliber_12g" value="1" <?php echo $selectedCalibers['12g'] ? 'checked' : ''; ?>>
                                 <label class="form-check-label text-bright" for="caliber-12g">
-                                    12 Gauge
+                                    12 Gauge (Shotguns)
                                 </label>
                             </div>
                         </div>
                         
-                        <button class="btn btn-accent w-100">Apply Filters</button>
-                        <button class="btn btn-outline-accent w-100 mt-2">Reset Filters</button>
+                        <button type="submit" class="btn btn-accent w-100">Apply Filters</button>
+                        <button type="button" class="btn btn-outline-accent w-100 mt-2" onclick="window.location='products.php';">Reset Filters</button>
                     </div>
                 </div>
                 
@@ -516,12 +626,12 @@ require_once 'auth.php';
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="text-white">Firearms Collection</h3>
                         <div class="d-flex">
-                            <select class="form-select me-2" style="width: auto;">
-                                <option>Sort by: Featured</option>
-                                <option>Price: Low to High</option>
-                                <option>Price: High to Low</option>
-                                <option>Name: A to Z</option>
-                                <option>Newest First</option>
+                            <select class="form-select me-2" id="sortSelect" name="sort" style="width: auto;">
+                                <option value="featured" <?php echo $sortBy === 'featured' ? 'selected' : ''; ?>>Sort by: Featured</option>
+                                <option value="price_asc" <?php echo $sortBy === 'price_asc' ? 'selected' : ''; ?>>Price: Low to High</option>
+                                <option value="price_desc" <?php echo $sortBy === 'price_desc' ? 'selected' : ''; ?>>Price: High to Low</option>
+                                <option value="name_asc" <?php echo $sortBy === 'name_asc' ? 'selected' : ''; ?>>Name: A to Z</option>
+                                <option value="newest" <?php echo $sortBy === 'newest' ? 'selected' : ''; ?>>Newest First</option>
                             </select>
                             <div class="btn-group">
                                 <button class="btn btn-outline-accent active"><i class="bi bi-grid-3x3-gap"></i></button>
@@ -529,19 +639,11 @@ require_once 'auth.php';
                             </div>
                         </div>
                     </div>
+                    </form>
                     
                     <div class="row g-4">
                         <?php
-                        // Fetch products from database
-                        $stmt = $pdo->query("
-                            SELECT p.*, c.name as category_name, t.name as team_name
-                            FROM products p
-                            LEFT JOIN category c ON p.category_id = c.id
-                            LEFT JOIN teams t ON p.team_id = t.id
-                            ORDER BY p.created_at DESC
-                        ");
-                        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+                        // Products already fetched based on selected filters and sort.
                         // Image mapping for products
                         $imageMap = [
                             'R-15 Tactical Rifle' => 'r15-tactical-rifle.jpg',
@@ -779,35 +881,36 @@ require_once 'auth.php';
 
     <script>
         // Price range display
-        document.getElementById('priceRange').addEventListener('input', function() {
-            const minPrice = 0;
-            const maxPrice = 5000;
-            const currentValue = this.value;
-            const range = document.querySelector('.price-range');
-            
-            if(currentValue < 500) {
-                range.textContent = `$0 - $${currentValue}`;
+        const priceRangeInput = document.getElementById('priceRange');
+        const priceRangeLabel = document.querySelector('.price-range');
+
+        function updatePriceRangeLabel(value) {
+            if (value < 500) {
+                priceRangeLabel.textContent = `$0 - $${value}`;
             } else {
-                range.textContent = `$${currentValue - 500} - $${currentValue}`;
+                priceRangeLabel.textContent = `$${value - 500} - $${value}`;
             }
+        }
+
+        priceRangeInput.addEventListener('input', function() {
+            updatePriceRangeLabel(this.value);
         });
 
-        // Filter functionality
-        document.querySelectorAll('.form-check-input').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                // In a real implementation, this would filter products
-                console.log('Filter changed:', this.id, this.checked);
+        // Automatically submit when sort changes
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
             });
-        });
+        }
 
         // View mode toggle
         document.querySelectorAll('.btn-group .btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                
-                // In a real implementation, this would change the product display layout
-                if(this.querySelector('.bi-list')) {
+
+                if (this.querySelector('.bi-list')) {
                     console.log('Switching to list view');
                 } else {
                     console.log('Switching to grid view');

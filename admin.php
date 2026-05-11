@@ -1,5 +1,5 @@
 <?php
-require_once 'database.php';
+require_once 'connection.php';
 require_once 'auth.php';
 requireAdmin(); // Only admins can access this page
 
@@ -60,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
                 break;
-<<<<<<< HEAD
 
             // New: update order status
             case 'update_order_status':
@@ -108,11 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Determine which admin page to show
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-=======
-        }
-    }
-}
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
+        
 ?>
 
 <!DOCTYPE html>
@@ -156,20 +151,15 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
             color: var(--text);
             padding: 1rem 1.5rem;
             border-bottom: 1px solid #444;
-<<<<<<< HEAD
             display: block;
-=======
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
         }
         
         .admin-nav .nav-link:hover,
         .admin-nav .nav-link.active {
             background-color: var(--accent);
             color: white;
-<<<<<<< HEAD
             text-decoration: none;
-=======
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
+
         }
         
         .stats-card {
@@ -312,20 +302,12 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                 </div>
                 
                 <nav class="admin-nav">
-<<<<<<< HEAD
                     <a href="admin.php" class="nav-link <?php echo $page === 'dashboard' ? 'active' : '';?>">Dashboard</a>
                     <a href="admin.php?page=users" class="nav-link <?php echo $page === 'users' ? 'active' : '';?>">User Management</a>
                     <a href="admin.php?page=products" class="nav-link <?php echo $page === 'products' ? 'active' : '';?>">Product Management</a>
                     <a href="admin.php?page=orders" class="nav-link <?php echo $page === 'orders' ? 'active' : '';?>">Order Management</a>
                     <a href="admin.php?page=transactions" class="nav-link <?php echo $page === 'transactions' ? 'active' : '';?>">Transactions</a>
                     <a href="admin.php?page=reports" class="nav-link <?php echo $page === 'reports' ? 'active' : '';?>">Reports</a>
-=======
-                    <a href="admin.php" class="nav-link active">Dashboard</a>
-                    <a href="admin.php?page=users" class="nav-link">User Management</a>
-                    <a href="admin.php?page=products" class="nav-link">Product Management</a>
-                    <a href="admin.php?page=orders" class="nav-link">Order Management</a>
-                    <a href="admin.php?page=reports" class="nav-link">Reports</a>
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
                     <a href="index.php" class="nav-link">← Back to Site</a>
                     <a href="logout.php" class="nav-link text-danger">Logout</a>
                 </nav>
@@ -333,7 +315,6 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
             
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 admin-content">
-<<<<<<< HEAD
                 <?php if ($page === 'dashboard'): ?>
                     <h2 class="mb-4">Administrator Dashboard</h2>
                     
@@ -472,76 +453,6 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4>Users</h4>
-=======
-                <h2 class="mb-4">Administrator Dashboard</h2>
-                
-                <!-- Success/Error Messages -->
-                <?php if (isset($success_message)): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <?php echo $success_message; ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (isset($error_message)): ?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <?php echo $error_message; ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <?php endif; ?>
-                
-                <!-- Stats Cards -->
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="stats-card">
-                            <h5>Total Users</h5>
-                            <h3 class="text-accent">
-                                <?php 
-                                $stmt = $pdo->query("SELECT COUNT(*) FROM users");
-                                echo $stmt->fetchColumn();
-                                ?>
-                            </h3>
-                            <p class="text-bright small mb-0">All registered users</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stats-card">
-                            <h5>Admins</h5>
-                            <h3 class="text-accent">
-                                <?php 
-                                $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'admin'");
-                                echo $stmt->fetchColumn();
-                                ?>
-                            </h3>
-                            <p class="text-bright small mb-0">Administrator accounts</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stats-card">
-                            <h5>Regular Users</h5>
-                            <h3 class="text-accent">
-                                <?php 
-                                $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'user'");
-                                echo $stmt->fetchColumn();
-                                ?>
-                            </h3>
-                            <p class="text-bright small mb-0">Standard user accounts</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stats-card">
-                            <h5>Active Sessions</h5>
-                            <h3 class="text-accent">-</h3>
-                            <p class="text-bright small mb-0">Currently logged in users</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- User Management -->
-                <div class="mt-5">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4>User Management</h4>
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
                         <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addUserModal">Add New User</button>
                     </div>
                     <div class="table-responsive">
@@ -558,58 +469,32 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                             </thead>
                             <tbody>
                                 <?php
-<<<<<<< HEAD
                                 try {
                                     $stmt = $pdo->query("SELECT * FROM users ORDER BY created_at DESC");
-                                    while ($user = $stmt->fetch(PDO::FETCH_ASSOC)):
+                                    while ($user = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 ?>
                                 <tr>
                                     <td><?php echo (int)$user['id']; ?></td>
-=======
-                                $stmt = $pdo->query("SELECT * FROM users ORDER BY created_at DESC");
-                                while ($user = $stmt->fetch(PDO::FETCH_ASSOC)):
-                                ?>
-                                <tr>
-                                    <td><?php echo $user['id']; ?></td>
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
                                     <td><?php echo htmlspecialchars($user['username']); ?></td>
                                     <td><?php echo htmlspecialchars($user['email']); ?></td>
                                     <td>
                                         <span class="badge <?php echo $user['role'] == 'admin' ? 'bg-accent' : 'bg-secondary'; ?>">
-<<<<<<< HEAD
                                             <?php echo htmlspecialchars(ucfirst($user['role'])); ?>
                                         </span>
                                     </td>
                                     <td><?php echo htmlspecialchars(date('M j, Y', strtotime($user['created_at']))); ?></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button class="btn btn-sm btn-outline-accent" data-bs-toggle="modal" data-bs-target="#editUserModal" 
+                                            <button class="btn btn-sm btn-outline-accent" data-bs-toggle="modal" data-bs-target="#editUserModal"
                                                 data-id="<?php echo (int)$user['id']; ?>"
                                                 data-username="<?php echo htmlspecialchars($user['username']); ?>"
                                                 data-email="<?php echo htmlspecialchars($user['email']); ?>"
                                                 data-role="<?php echo htmlspecialchars($user['role']); ?>">
-=======
-                                            <?php echo ucfirst($user['role']); ?>
-                                        </span>
-                                    </td>
-                                    <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <button class="btn btn-sm btn-outline-accent" data-bs-toggle="modal" data-bs-target="#editUserModal" 
-                                                data-id="<?php echo $user['id']; ?>"
-                                                data-username="<?php echo htmlspecialchars($user['username']); ?>"
-                                                data-email="<?php echo htmlspecialchars($user['email']); ?>"
-                                                data-role="<?php echo $user['role']; ?>">
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
                                                 Edit
                                             </button>
                                             <?php if ($user['id'] != $_SESSION['user_id']): ?>
-                                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal" 
-<<<<<<< HEAD
+                                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal"
                                                     data-id="<?php echo (int)$user['id']; ?>"
-=======
-                                                    data-id="<?php echo $user['id']; ?>"
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
                                                     data-username="<?php echo htmlspecialchars($user['username']); ?>">
                                                     Delete
                                                 </button>
@@ -617,9 +502,8 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                                         </div>
                                     </td>
                                 </tr>
-<<<<<<< HEAD
-                                <?php 
-                                    endwhile;
+                                <?php
+                                    }
                                 } catch (Exception $e) {
                                     echo '<tr><td colspan="6" class="text-bright">Unable to load users.</td></tr>';
                                 }
@@ -661,7 +545,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                                 <?php
                                 try {
                                     $stmt = $pdo->query("SELECT o.*, u.username FROM orders o LEFT JOIN users u ON o.user_id = u.id ORDER BY o.created_at DESC");
-                                    while ($order = $stmt->fetch(PDO::FETCH_ASSOC)):
+                                    while ($order = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 ?>
                                 <tr>
                                     <td><?php echo (int)$order['id']; ?></td>
@@ -673,10 +557,8 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                                         <div class="action-buttons">
                                             <button class="btn btn-sm btn-outline-accent" data-bs-toggle="modal" data-bs-target="#viewOrderModal"
                                                 data-id="<?php echo (int)$order['id']; ?>">View</button>
-
                                             <button class="btn btn-sm btn-accent" data-bs-toggle="modal" data-bs-target="#updateOrderStatusModal"
                                                 data-id="<?php echo (int)$order['id']; ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>">Update Status</button>
-
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="action" value="delete_order">
                                                 <input type="hidden" name="id" value="<?php echo (int)$order['id']; ?>">
@@ -685,7 +567,8 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                                         </div>
                                     </td>
                                 </tr>
-                                <?php endwhile;
+                                <?php
+                                    }
                                 } catch (Exception $e) {
                                     echo '<tr><td colspan="6" class="text-bright">No orders or unable to read orders table.</td></tr>';
                                 }
@@ -840,13 +723,6 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                     <p class="text-bright">The requested admin page is not available.</p>
                 <?php endif; ?>
 
-=======
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
                 <!-- Recent Activity Section -->
                 <div class="mt-5">
                     <h4 class="mb-3">Recent Activity</h4>
@@ -863,15 +739,11 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                         </div>
                     </div>
                 </div>
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
             </div>
         </div>
     </div>
 
-<<<<<<< HEAD
     <!-- Existing Modals: Edit/Delete/Add user (unchanged) -->
-=======
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
     <!-- Edit User Modal -->
     <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -1012,7 +884,6 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                 document.getElementById('deleteUsername').textContent = username;
             });
         }
-<<<<<<< HEAD
 
         // View Order Modal: fetch details via AJAX (fetch)
         const viewOrderModal = document.getElementById('viewOrderModal');
@@ -1093,22 +964,17 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
                     });
             });
         }
-=======
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
         
         // Auto-dismiss alerts after 5 seconds
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(function(alert) {
-<<<<<<< HEAD
                 try {
                     const bsAlert = new bootstrap.Alert(alert);
                     bsAlert.close();
-                } catch (e) {}
-=======
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
->>>>>>> de6e7a0a362d839be0dc496211d21b1c6f5be87f
+                } catch (e) {
+                    // Ignore if alert cannot be dismissed
+                }
             });
         }, 5000);
     </script>
