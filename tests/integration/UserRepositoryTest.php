@@ -113,8 +113,8 @@ class UserRepositoryTest extends DatabaseTest
     {
         $data = [
             'username' => 'bisnis',
-            'email'=>'bisnis@gmail.com',
-            'password'=>'bisnis123',
+            'email' => 'bisnis@gmail.com',
+            'password' => 'bisnis123',
         ];
         $this->repo->register($data);
         $user = $this->repo->findByEmail('bisnis@gmail.com');

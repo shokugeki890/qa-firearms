@@ -24,6 +24,8 @@ abstract class DatabaseTest extends TestCase
         $this->pdo->exec("DELETE FROM transaction");
         $this->pdo->exec("DELETE FROM order_items");
         $this->pdo->exec("DELETE FROM products");
+        $this->pdo->exec("INSERT IGNORE INTO teams (id, name) VALUES (1, 'Team Alpha')");
+        $this->pdo->exec("INSERT IGNORE INTO category (id, name) VALUES (1, 'General')");
         $this->pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
         $this->pdo->beginTransaction();
     }
