@@ -1,7 +1,7 @@
 <?php
-require_once 'tests/integration/DatabaseTest.php';
+require_once 'tests/integration/DatabaseTestCase.php';
 require_once 'src/ProductRepository.php';
-class ProductRepositoryTest extends DatabaseTest
+class ProductRepositoryTest extends DatabaseTestCase
 {
     private ProductRepository $repo;
     #[Override]

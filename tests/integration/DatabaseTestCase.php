@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require_once 'src/ProductRepository.php';
 
-abstract class DatabaseTest extends TestCase
+abstract class DatabaseTestcase extends TestCase
 {
     private ProductRepository $repo;
     protected PDO $pdo;

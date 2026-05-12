@@ -1,7 +1,7 @@
 <?php
 require_once 'src/UserRepository.php';
-require_once 'tests/integration/DatabaseTest.php';
-class UserRepositoryTest extends DatabaseTest
+require_once 'tests/integration/DatabaseTestCase.php';
+class UserRepositoryTest extends DatabaseTestCase
 {
     private UserRepository $repo;
     #[Override]

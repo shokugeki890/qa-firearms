@@ -2,10 +2,10 @@
 
 use PHPUnit\Framework\Attributes\DataProvider;
 
-require_once 'tests/integration/DatabaseTest.php';
+require_once 'tests/integration/DatabaseTestCase.php';
 require_once 'src/OrderRepository.php';
 
-class OrderRepositoryTest extends DatabaseTest
+class OrderRepositoryTest extends DatabaseTestCase
 {
     protected PDO $pdo;
     private OrderRepository $repo;
