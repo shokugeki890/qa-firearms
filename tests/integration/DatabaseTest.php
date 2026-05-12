@@ -1,6 +1,11 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
-abstract class DatabaseTest extends TestCase{
+require_once 'src/ProductRepository.php';
+
+abstract class DatabaseTest extends TestCase
+{
+    private ProductRepository $repo;
     protected PDO $pdo;
     #[Override]
     protected function setUp(): void
@@ -12,11 +17,21 @@ abstract class DatabaseTest extends TestCase{
 
         $this->pdo = new PDO("mysql:host=$host;dbname=$database", $username, $password);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        parent::setUp();
+        $this->repo = new ProductRepository($this->pdo);
+        $this->pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
+        $this->pdo->exec("DELETE FROM transaction");
+        $this->pdo->exec("DELETE FROM order_items");
+        $this->pdo->exec("DELETE FROM products");
+        $this->pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
         $this->pdo->beginTransaction();
     }
     #[Override]
     protected function tearDown(): void
     {
-        $this->pdo->rollBack();
+        if ($this->pdo->inTransaction()) {
+            $this->pdo->rollBack();
+        }
     }
 }
